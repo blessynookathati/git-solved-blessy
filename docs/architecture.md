@@ -1,31 +1,15 @@
-# System Architecture
+# DevOps Simulator Architecture
 
 ## Overview
-DevOps Simulator follows a microservices architecture designed for high availability and scalability.
+The system utilizes a standard microservices architecture for reliable deployment and monitoring. Key components include the Configuration Service, Monitoring Agent, and Deployment Scheduler. All communication is secured via mutual TLS.
 
-## Components
+## Data Flow
+Configuration is pulled from a centralized database (PostgreSQL/Redis), pushed to agents via a message queue (Kafka), and executed by the Deployment Scheduler.
 
-### 1. Application Server
-- **Technology**: Node.js + Express
-- **Port**: 8080
-- **Scaling**: Horizontal auto-scaling enabled
+## New Experimental AI Layer (V3.0)
+An experimental layer has been added for AI-powered optimization. This layer uses a decoupled event-driven architecture to integrate:
+* Predictive Scaling Modules
+* Anomaly Detection Services
+* Chaos Engineering Tools
 
-### 2. Database Layer
-- **Database**: PostgreSQL 14
-- **Configuration**: Master-slave replication
-- **Backup**: Daily automated backups
-
-### 3. Monitoring System
-- **Tool**: Prometheus + Grafana
-- **Metrics**: CPU, Memory, Disk, Network
-- **Alerts**: Email notifications for critical issues
-
-## Deployment Strategy
-- **Method**: Rolling updates
-- **Zero-downtime**: Yes
-- **Rollback**: Automated on failure
-
-## Security
-- SSL/TLS encryption
-- Database connection encryption
-- Regular security audits
+**Note:** This layer is currently in testing and disabled by default in production settings.

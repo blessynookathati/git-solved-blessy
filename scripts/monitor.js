@@ -1,36 +1,54 @@
-/**
- * System Monitoring Script - Production
- * Monitors application health and performance
- */
+// Monitor script for production system health
+const os = require('os');
+const { performance } = require('perf_hooks');
 
-const monitorConfig = {
-  interval: 60000, // 1 minute
-  alertThreshold: 80,
-  metricsEndpoint: 'http://localhost:8080/metrics'
-};
+const config = require('../config/app-config.yaml');
+const LOG_LEVEL = config.logging.level || 'INFO';
 
-console.log('=================================');
-console.log('DevOps Simulator - Monitor v1.0');
-console.log('=================================');
-
-function checkSystemHealth() {
-  console.log(`[${new Date().toISOString()}] Checking system health...`);
-  
-  // Check CPU usage
-  console.log('✓ CPU usage: Normal');
-  
-  // Check Memory
-  console.log('✓ Memory usage: Normal');
-  
-  // Check Disk
-  console.log('✓ Disk space: Adequate');
-  
-  console.log('System Status: HEALTHY');
+function log(message, level = 'INFO') {
+    if (LOG_LEVEL === 'DEBUG' || LOG_LEVEL === level) {
+        console.log(`[${new Date().toISOString()}] [${level}] ${message}`);
+    }
 }
 
-// Start monitoring
-console.log(`Monitoring every ${monitorConfig.interval}ms`);
-setInterval(checkSystemHealth, monitorConfig.interval);
+function runPerformanceCheck() {
+    const t0 = performance.now();
+    // Simulate complex health check logic
+    for (let i = 0; i < 1e6; i++) {}
+    const t1 = performance.now();
+    log(`Health check completed in ${t1 - t0} ms.`, 'DEBUG');
+    return t1 - t0;
+}
 
-// Run first check immediately
+function checkSystemHealth() {
+    log("Running system health check...");
+    
+    // Check CPU/Memory load
+    const cpuLoad = os.loadavg()[0];
+    const freeMemory = os.freemem() / 1024 / 1024; // MB
+
+    if (cpuLoad > 2.0) {
+        log(`WARNING: High CPU Load: ${cpuLoad}`, 'WARN');
+    }
+    if (freeMemory < 100) {
+        log(`ALERT: Low Free Memory: ${freeMemory.toFixed(2)} MB`, 'ALERT');
+    }
+
+    // New AI-related check
+    if (config.experimental.ai_enabled) {
+        // Placeholder for new AI model status check
+        log("Checking AI model stability (Experimental)...", 'DEBUG');
+    }
+
+    const performanceTime = runPerformanceCheck();
+    if (performanceTime > 50) {
+        log(`PERF ALERT: Slow check time: ${performanceTime}ms`, 'WARN');
+    }
+
+    log("System check finished.");
+}
+
+// Run health check every 30 seconds
+setInterval(checkSystemHealth, 30000);
+log(`Monitoring script started. Level: ${LOG_LEVEL}`);
 checkSystemHealth();

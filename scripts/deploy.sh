@@ -1,36 +1,33 @@
 #!/bin/bash
-# Production Deployment Script
-# Version: 1.0.0
-
 set -e
 
-echo "====================================="
-echo "DevOps Simulator - Production Deploy"
-echo "====================================="
+ENVIRONMENT=$1
+EXPERIMENTAL_FLAG=$2
 
-# Configuration
-DEPLOY_ENV="production"
-DEPLOY_REGION="us-east-1"
-APP_PORT=8080
+echo "Starting deployment for environment: $ENVIRONMENT"
 
-echo "Environment: $DEPLOY_ENV"
-echo "Region: $DEPLOY_REGION"
-echo "Port: $APP_PORT"
-
-# Pre-deployment checks
-echo "Running pre-deployment checks..."
-if [ ! -f "config/app-config.yaml" ]; then
-    echo "Error: Configuration file not found!"
+# Check for production requirements
+if [ "$ENVIRONMENT" != "production" ]; then
+    echo "ERROR: Deployment must be run in a specified environment."
     exit 1
 fi
 
-# Deploy application
-echo "Starting deployment..."
-echo "Pulling latest Docker images..."
-# docker pull devops-simulator:latest
+# Standard Deployment Steps
+echo "1. Fetching latest code..."
+git pull origin main
 
-echo "Rolling update strategy initiated..."
-# kubectl rolling-update devops-simulator
+echo "2. Building application images..."
+docker-compose build --parallel
 
-echo "Deployment completed successfully!"
-echo "Application available at: https://app.example.com"
+echo "3. Starting standard services..."
+docker-compose up -d --scale web=3 --remove-orphans
+
+# Experimental AI Integration Logic (Only runs if flag is set)
+if [ "$EXPERIMENTAL_FLAG" == "--experimental" ]; then
+    echo "4. Enabling experimental AI services..."
+    npm run start:ai
+else
+    echo "4. Skipping experimental AI services (not requested)."
+fi
+
+echo "Deployment complete."
