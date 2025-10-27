@@ -30,5 +30,3 @@ See `/docs` folder for detailed documentation.
 
 ## License
 MIT License
-# Add this line to the bottom of the file
-## Work In Progress Styling Changes
